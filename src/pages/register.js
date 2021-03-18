@@ -4,34 +4,32 @@ import {Card, Form, Button, Container} from 'react-bootstrap'
 import {Navbar, Nav} from 'react-bootstrap'
 import {Link} from 'react-router-dom'
 
-class Login extends React.Component {
+class Register extends React.Component {
     constructor () {
         super();
         this.state = {
+            email:"",
             username: "",
             password: "",
             message: "",
-            logged: true
+            registered: false
         }
     }
-    Login = event => {
+    Register = event => {
         const base_url = "http://localhost:2000"
         event.preventDefault()
         let sendData = {
+            email: this.state.email,
             username: this.state.username,
             password: this.state.password
         }
-        let url = base_url + "/login"
+        let url = base_url + "/register"
         
         axios.post(url, sendData)
         .then(response => {
-            this.setState({logged: response.data.logged})
-            if (this.state.logged) {
-                let user = response.data.data
-                let token = response.data.token
-                localStorage.setItem("user", JSON.stringify(user))
-                localStorage.setItem("token", token)
-                this.props.history.push("/pegawai")
+            this.setState({registered: true})
+            if (this.state.registered) {
+                this.setState({message: response.data.message})
             } else {
                 this.setState({message: response.data.message})
             }
@@ -44,14 +42,17 @@ class Login extends React.Component {
                 <Card className="col-sm-6 card my-5">
                 <Card.Header className="card-header bg-primary text-white text-center">LOGIN</Card.Header>
                 <Card.Body>
-                    { !this.state.logged ? 
+                    { this.state.registered ? 
                         (
                             <div className="alert alert-danger mt-1">
                                 { this.state.message }
                             </div>
                         ) : null }
-                    <Form onSubmit={ev => this.Login(ev)}>
+                    <Form onSubmit={ev => this.Register(ev)}>
                     <Card.Text>
+                        <Form.Label>Email</Form.Label>
+                            <Form.Control type="text" placeholder="Email" value={this.state.email}
+                            onChange={ev => this.setState({email: ev.target.value})}/>
                         <Form.Group controlId="username">
                             <Form.Label>Username</Form.Label>
                             <Form.Control type="text" placeholder="Enter Username" value={this.state.username}
@@ -63,9 +64,9 @@ class Login extends React.Component {
                             onChange={ev => this.setState({password: ev.target.value})}
                             autoComplete="false" />
                         </Form.Group>
-                        </Card.Text>
-                    <Button variant="primary" type="submit">Submit</Button>
-                    <Nav.Link><Link to='/register'><strong>Tidak punya akun? Sign Up</strong></Link></Nav.Link>
+                    </Card.Text>
+                    <Button variant="dark" type="submit">Submit</Button>
+                    <Nav.Link><Link to='/login'><strong>Sudah memiliki akun ? Login</strong></Link></Nav.Link>
                     </Form>
                 </Card.Body>
                 </Card>
@@ -74,4 +75,4 @@ class Login extends React.Component {
     }
 }
 
-export default Login
+export default Register
